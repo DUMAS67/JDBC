@@ -16,7 +16,6 @@ public class TestConnexionJdbc {
 			ResourceBundle monFichierConf = ResourceBundle.getBundle("database");
 			String user = monFichierConf.getString("user");
 			String password = monFichierConf.getString("password");
-
 			String url = "jdbc:" + monFichierConf.getString("url");
 			Connection maConnection = DriverManager.getConnection(url, user, password);
 			System.out.println(maConnection.getCatalog());
