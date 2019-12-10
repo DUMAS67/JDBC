@@ -1,0 +1,7 @@
+/target
+/bin
+/libext
+/.settings
+.classpath
+.gitignore.swp
+.project
