@@ -3,6 +3,7 @@ package test.java;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 import org.mariadb.jdbc.Driver;
 
@@ -12,14 +13,15 @@ public class TestConnexionJdbc {
 		// TODO Auto-generated method stub
 		try {
 			DriverManager.registerDriver(new Driver());
-			String user = "u62ktagdxswnv1uk";
-			String password = "0ZB5W9ESwCMAS2FLIrXq";
-			String url = "jdbc:mariadb://bssfeveqoxjcx2plc0lr-mysql.services.clever-cloud.com:3306/bssfeveqoxjcx2plc0lr";
+			ResourceBundle monFichierConf = ResourceBundle.getBundle("database");
+			String user = monFichierConf.getString("user");
+			String password = monFichierConf.getString("password");
+
+			String url = "jdbc:" + monFichierConf.getString("url");
 			Connection maConnection = DriverManager.getConnection(url, user, password);
 			System.out.println(maConnection.getCatalog());
 			maConnection.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
