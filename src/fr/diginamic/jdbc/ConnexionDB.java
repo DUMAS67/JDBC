@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-/* Classe qui connecte une base de donnée par fichier de logging*/
+/* Classe qui connecte une base de donnée par fichier de paramétrage*/
 
 public class ConnexionDB {
 
@@ -26,7 +26,6 @@ public class ConnexionDB {
 			}
 			maConnection = DriverManager.getConnection(url, user, password);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
