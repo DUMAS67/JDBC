@@ -75,6 +75,12 @@ public class TestJdbcArticles {
 			ArticleDaoJdbc aa = new ArticleDaoJdbc(curseur);
 			ArrayList<Article> listA = aa.extraire();
 			aa.afficheListArticle(listA);
+			
+			/* fermeture des pointeurs sur le fichier de configuration et de la base*/
+			peinture.close();
+			curseur.close();
+			monSt.close();
+			maConnection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
