@@ -2,10 +2,10 @@ package fr.diginamic.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ResourceBundle;
+
+/* Classe qui connecte une base de donnée par fichier de logging*/
 
 public class ConnexionDB {
 

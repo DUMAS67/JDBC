@@ -1,5 +1,7 @@
 package fr.diginamic.jdbc;
 
+/* Classe executable qui efface une valeur dans la base des Fournissseurs*/
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,15 +11,24 @@ import java.util.ArrayList;
 import fr.diginamic.jdbc.dao.FournisseurDaoJdbc;
 import fr.diginamic.jdbc.entites.Fournisseur;
 
-public class TestSelect {
+public class TestDelete {
 
-	/* Classe executable qui scrute la base des Fournissseurs*/
 	public static void main(String[] args) {
-
+		// TODO Auto-generated method stub
+		Connection maConnection = null;
 		try {
-			Connection maConnection = ConnexionDB.connecter("database");
+			Boolean delOk = false;
+			maConnection = ConnexionDB.connecter("database");
 			Statement monSt = maConnection.createStatement();
-			
+			FournisseurDaoJdbc del = new FournisseurDaoJdbc(monSt);
+			delOk = del.delete(new Fournisseur(4, "La Maison des Peintures"));
+
+			if (delOk) {
+				maConnection.commit();
+			} else {
+				maConnection.rollback();
+			}
+
 			/* Affichage liste fournisseur pour contrôle des tests*/
 			ResultSet curseur = monSt.executeQuery("SELECT * FROM FOURNISSEUR ");
 			FournisseurDaoJdbc a = new FournisseurDaoJdbc(curseur);
@@ -28,10 +39,15 @@ public class TestSelect {
 			curseur.close();
 			monSt.close();
 			maConnection.close();
-			a.afficheListFournisseur(lFour);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			try {
+				maConnection.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 }
