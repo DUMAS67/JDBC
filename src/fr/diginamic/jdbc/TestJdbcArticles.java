@@ -1,12 +1,7 @@
 package fr.diginamic.jdbc;
-
-/* Classe executable de test de Table ARTICLE ET FOURNISSEUR*/
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+/* Classe executable de test pour ecriture, effacement d'articles
+ *  et de fournisseurs selon certains critères sur une base de donnée*/
 import java.util.ArrayList;
-
 import fr.diginamic.jdbc.dao.ArticleDaoJdbc;
 import fr.diginamic.jdbc.dao.FournisseurDaoJdbc;
 import fr.diginamic.jdbc.entites.Article;
@@ -16,74 +11,49 @@ public class TestJdbcArticles {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		try {
-			Connection maConnection = ConnexionDB.connecter("database");
-			Statement monSt = maConnection.createStatement();
-			FournisseurDaoJdbc fInsert = new FournisseurDaoJdbc(monSt);
-			fInsert.insert(new Fournisseur(4, "La Maison des Peintures"));
-			maConnection.commit();
-			ArticleDaoJdbc a = new ArticleDaoJdbc(monSt);
-			a.insert(new Article(11, "X23", "Peinture blanche 1L", 12.5, 4));
-			a.insert(new Article(12, "X24", "Peinture rouge mate 1L", 15.5, 4));
-			a.insert(new Article(13, "X26", "Peinture noire laquée 1L", 17.8, 4));
-			a.insert(new Article(14, "X12", "Peinture bleue mate 1L", 15.5, 4));
-			maConnection.commit();
-			int up = a.lCommandeUpdate("UPDATE ARTICLE SET PRIX=(PRIX*0.75) where DESIGNATION LIKE '%mate %'");
-			if (up == 1) {
-				maConnection.commit();
-			} else {
-				maConnection.rollback();
-			}
+		ArticleDaoJdbc a = new ArticleDaoJdbc();
+		FournisseurDaoJdbc f = new FournisseurDaoJdbc();
+		f.insert(new Fournisseur(4, "La Maison des Peintures"));
+		a.insert(new Article(11, "X23", "Peinture blanche 1L", 12.5, 4));
+		a.insert(new Article(12, "X24", "Peinture rouge mate 1L", 15.5, 4));
+		a.insert(new Article(13, "X26", "Peinture noire laquée 1L", 17.8, 4));
+		a.insert(new Article(14, "X12", "Peinture bleue mate 1L", 15.5, 4));
+		/* Baisse du prix de 25% d'Article de Peinture mate */
+		String requete = "UPDATE ARTICLE SET PRIX=(PRIX*0.75) where DESIGNATION LIKE '%mate %'";
+		a.askVoid(requete);
+		/*
+		 * Affichage de la liste des Articles
+		 */
+		ArrayList<Article> listArticle = a.extraire();
+		a.afficheListArticle(listArticle);
 
-			/* la Base renvoie le calcul de la moyenne des prix de peinture */
-			ResultSet avg = monSt.executeQuery("SELECT AVG(PRIX) from ARTICLE");
-			if (avg.first() != false) {
-				// on teste bien qu'il y est un resultat dans le resultset
-				// (on se place aussi sur le premier enregistrement)
-				Double result = avg.getDouble(1);
-				System.out.println("Prix moyen des Articles : " + result);
-			}
+		/* la Base renvoie le calcul de la moyenne des prix de peinture */
+		requete = "SELECT AVG(PRIX) from ARTICLE";
+		Double resultat = a.askDouble(requete);
+		System.out.println("Prix moyen des Articles : " + resultat);
 
-			/*
-			 * Suppression des articles contenant les articles contenant de la
-			 * peinture
-			 */
-			ResultSet peinture = monSt.executeQuery("SELECT * FROM ARTICLE WHERE DESIGNATION LIKE '%Peinture %'");
-			ArticleDaoJdbc p = new ArticleDaoJdbc(peinture);
-			ArrayList<Article> listP = p.extraire();
-			boolean f = false;
-			ArticleDaoJdbc p1 = new ArticleDaoJdbc(monSt);
-			for (Article aP : listP) {
-				f = p1.delete(aP);
-				if (f) {
-					maConnection.commit();
-				} else {
-					maConnection.rollback();
-				}
-			}
-			/* Effacement d'un Fournisseur */
-			Fournisseur fO = new Fournisseur(4, "La Maison des Peintures");
-			f = fInsert.delete(fO);
-			if (f) {
-				maConnection.commit();
-			} else {
-				maConnection.rollback();
-			}
+		
+		 /* *
+		 * Suppression des articles contenant les articles contenant de la
+		 * peinture
+		 */
+		requete = "SELECT * FROM ARTICLE WHERE DESIGNATION LIKE '%Peinture %'";
+		a.setCommandeExtraction(requete);
+		ArrayList<Article> listArt = a.extraire();
+		a.effacerListArticle(listArt);
 
-			/* Affichage liste Article pour contrôle des tests */
-			ResultSet curseur = monSt.executeQuery("SELECT * FROM ARTICLE ");
-			ArticleDaoJdbc aa = new ArticleDaoJdbc(curseur);
-			ArrayList<Article> listA = aa.extraire();
-			aa.afficheListArticle(listA);
-			
-			/* fermeture des pointeurs sur le fichier de configuration et de la base*/
-			peinture.close();
-			curseur.close();
-			monSt.close();
-			maConnection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		/* Effacement d'un Fournisseur */
+		Fournisseur fO = new Fournisseur(4, "La Maison des Peintures");
+		f.delete(fO);
+
+		/* Affichage liste Article pour contrôle des tests */
+		ArrayList<Article> lArt = a.extraire();
+		a.afficheListArticle(lArt);
+
+		/*
+		 * fermeture des pointeurs sur le fichier de configuration et de la base
+		 */
+		a.closeConnection();
+		f.closeConnection();
 	}
 }
